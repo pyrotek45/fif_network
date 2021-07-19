@@ -19,7 +19,7 @@ type
         gates : array of fif_gate;
         gate_output : array of int_p;
         constructor create(buffer_size,gate_size,genome_size:integer);
-        procedure morph();
+        procedure rebuild();
         procedure reset_buffer();
         function new_offspring():gate_network;
         procedure compute();
@@ -47,32 +47,34 @@ begin
 
     genes := genome.create(self.genomesize);
 
-    for i := 0 to high(self.buffer) do self.buffer[i] := 0;
+    for i := 0 to self.buffersize do self.buffer[i] := 0;
 
-    for i := 0 to high(self.gates) do 
+    self.genes.index := 0;
+
+    for i := 0 to self.gatesize do 
         self.gates[i] := fif_gate.create(
-        @self.buffer[genes.get_next() mod high(self.buffer) + 1],
-        @self.buffer[genes.get_next() mod high(self.buffer) + 1],
-        @self.buffer[genes.get_next() mod high(self.buffer) + 1]);
+        @self.buffer[genes.get_next() mod self.buffersize],
+        @self.buffer[genes.get_next() mod self.buffersize],
+        @self.buffer[genes.get_next() mod self.buffersize]);
 
-    for i := 0 to high(self.gates) do self.gate_output[i] := @self.buffer[genes.get_next() mod high(self.buffer) + 1]
+    for i := 0 to self.gatesize do self.gate_output[i] := @self.buffer[genes.get_next() mod self.buffersize]
 
 end;
 
-procedure gate_network.morph();
+procedure gate_network.rebuild();
 var 
     i : integer;
 begin
 
     self.genes.index := 0;
 
-    for i := 0 to high(self.gates) do 
+    for i := 0 to self.gatesize do 
         self.gates[i].set_input(
-        @self.buffer[genes.get_next() mod high(self.buffer) + 1],
-        @self.buffer[genes.get_next() mod high(self.buffer) + 1],
-        @self.buffer[genes.get_next() mod high(self.buffer) + 1]);
+        @self.buffer[genes.get_next() mod self.buffersize],
+        @self.buffer[genes.get_next() mod self.buffersize],
+        @self.buffer[genes.get_next() mod self.buffersize]);
 
-    for i := 0 to high(self.gates) do self.gate_output[i] := @self.buffer[genes.get_next() mod high(self.buffer) + 1]
+    for i := 0 to self.gatesize do self.gate_output[i] := @self.buffer[genes.get_next() mod self.buffersize]
 
 end;
 
@@ -93,8 +95,8 @@ var
 begin
     temp := gate_network.create(self.buffersize,self.gatesize,self.genomesize);
     temp.genes := self.genes;
-    temp.morph();
-    exit(temp)
+    temp.rebuild();
+    exit(temp);
 end;
 
 procedure gate_network.reset_buffer();

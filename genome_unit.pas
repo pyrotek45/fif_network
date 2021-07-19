@@ -52,8 +52,8 @@ begin
     end
     else
     begin
-        self.gene[mutated_gene] -= random(5);
-        if self.gene[mutated_gene] <= 255 then self.gene[mutated_gene] := 255;
+        self.gene[mutated_gene] -= random(5);   
+        if self.gene[mutated_gene] <= 0 then self.gene[mutated_gene] := 0;
     end;
 end;
 

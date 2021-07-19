@@ -15,63 +15,72 @@ type
 
 var
 
-    i,j,sum : integer;
+    i,j,score : integer;
     agent,newguy : gate_network;
     population : gate_network_list; 
-
     genorations : integer;
     current_agent : gate_network;
+    best : integer;
+    sacrifice,temp1,winner,temp2,better : integer;
+    avg : double;
 
-    sacrifice,temp1,temp2,better : integer;
 begin
     
     randomize;
 
+    //setup
     population := gate_network_list.create(true);
-    for i := 0 to 100 do population.add(gate_network.create(20,30,20));
+    genorations := 10000000;
     
-    genorations := 10;
-    for i := 1 to 100000000 do 
+    //populate the list of agents
+    for i := 0 to 100 do population.add(gate_network.create(50,50,100));
+
+    //start evolution
+    best := 0;
+    for i := 1 to genorations do 
     begin
-        //writeln('gen  ' + inttostr(i));
+
+        //compute every agents fitness
         for current_agent in population do
         begin
             current_agent.reset_buffer();
             current_agent.compute();
-            sum := 0;
-            for j := 0 to high(current_agent.buffer) do sum += current_agent.buffer[j];
-            current_agent.fitness := sum;
-            //for j := 0 to high(current_agent.buffer) do write(current_agent.buffer[j]);
-            //writeln('   sum  ' + inttostr(sum));
+            current_agent.fitness := sumint(current_agent.buffer);
         end;
         
-        temp1 := random(101);
-        temp2 := random(101);
         
-        if population[temp1].fitness >= population[temp2].fitness then
+        //select a strong agent out of ten and sacrifice a random agent
+        sacrifice := random(101);
+        winner := 0;
+        for j := 0 to 10 do 
         begin
-            sacrifice := temp2;
-            better := temp1;
-            population[sacrifice].genes.gene := copy(population[temp1].genes.gene,0,length(population[temp1].genes.gene));
-            population[sacrifice].genes.mutate();
-            population[sacrifice].morph();
-            //for j := 0 to high(population[temp1].buffer) do write(population[temp1].buffer[j]);
-        end
-        else
-        begin
-            sacrifice := temp1; 
-            better := temp2;
-            population[sacrifice].genes.gene := copy(population[temp2].genes.gene,0,length(population[temp2].genes.gene));
-            //population[sacrifice].genes.mutate();
-            population[sacrifice].morph();
-            //for j := 0 to high(population[temp2].buffer) do write(population[temp2].buffer[j]);
+            temp1 := random(101);
+            if population[temp1].fitness > population[winner].fitness then winner := temp1;
         end;
+        
+        population[sacrifice].genes.gene := copy(population[winner].genes.gene);
+        population[sacrifice].genes.mutate();
+        population[sacrifice].rebuild();
 
-        //writeln('the sacrifice is index ' + inttostr(sacrifice));
+        //print the strongest of the genorations
         if i mod 1000 = 0 then
         begin
-            for j := 0 to high(population[better].buffer) do write(population[better].buffer[j]);
-            write('     ' + inttostr(i));
+            //reset the best
+            best := 0;
+            for j := 0 to population.count - 1 do 
+            begin
+                if population[j].fitness > population[best].fitness then best := j;
+            end;
+            //show the best agents buffer(brain)
+            for j := 0 to high(population[best].buffer) do write(population[best].buffer[j]);
+            write('  GEN  ' , i);
+            avg := 0;
+            for current_agent in population do
+            begin
+                avg += current_agent.fitness;
+            end;
+            avg := avg / (population.count -1);
+            write('  AVG  ' , avg:0:2);
             writeln;
         end;
 

@@ -21,7 +21,7 @@ var
     genorations : integer;
     current_agent : gate_network;
     best : integer;
-    sacrifice,temp1,winner,temp2,better : integer;
+    selection_size,sacrifice,temp1,winner,temp2,better : integer;
     avg : double;
 
 begin
@@ -33,8 +33,9 @@ begin
     genorations := 10000000;
     pop_size := 10000; 
     debug_interval := 100;
+    selection_size := 100;
     //populate the list of agents
-    for i := 0 to pop_size do population.add(gate_network.create(100,100,4000));
+    for i := 0 to pop_size do population.add(gate_network.create(80,90,500));
 
     //start evolution
     best := 0;
@@ -53,7 +54,7 @@ begin
         //select a strong agent out of ten and sacrifice a random agent
         sacrifice := random(population.count);
         winner := 0;
-        for j := 0 to 10 do 
+        for j := 0 to selection_size do 
         begin
             temp1 := random(population.count);
             if population[temp1].fitness > population[winner].fitness then winner := temp1;

@@ -13,7 +13,7 @@ type
         gene : array of integer;
         function get_next():integer;
         constructor create(_size:integer);
-        procedure mutate();
+        procedure mutate(strength:integer = 2);
     end;
 
 implementation
@@ -38,7 +38,7 @@ begin
     self.index += 1;
 end;
 
-procedure genome.mutate();
+procedure genome.mutate(strength:integer = 2);
 var
     mutated_gene : integer;
 begin
@@ -47,12 +47,12 @@ begin
     
     if random(2) = 1 then
     begin
-        self.gene[mutated_gene] += random(5);
+        self.gene[mutated_gene] += random(strength);
         if self.gene[mutated_gene] >= 255 then self.gene[mutated_gene] := 255;
     end
     else
     begin
-        self.gene[mutated_gene] -= random(5);   
+        self.gene[mutated_gene] -= random(strength);   
         if self.gene[mutated_gene] <= 0 then self.gene[mutated_gene] := 0;
     end;
 end;

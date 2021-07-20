@@ -15,7 +15,7 @@ type
 
 var
 
-    i,j,score : integer;
+    debug_interval,pop_size,i,j,score : integer;
     agent,newguy : gate_network;
     population : gate_network_list; 
     genorations : integer;
@@ -31,9 +31,10 @@ begin
     //setup
     population := gate_network_list.create(true);
     genorations := 10000000;
-    
+    pop_size := 10000; 
+    debug_interval := 100;
     //populate the list of agents
-    for i := 0 to 100 do population.add(gate_network.create(50,50,100));
+    for i := 0 to pop_size do population.add(gate_network.create(100,100,4000));
 
     //start evolution
     best := 0;
@@ -50,11 +51,11 @@ begin
         
         
         //select a strong agent out of ten and sacrifice a random agent
-        sacrifice := random(101);
+        sacrifice := random(population.count);
         winner := 0;
         for j := 0 to 10 do 
         begin
-            temp1 := random(101);
+            temp1 := random(population.count);
             if population[temp1].fitness > population[winner].fitness then winner := temp1;
         end;
         
@@ -63,7 +64,7 @@ begin
         population[sacrifice].rebuild();
 
         //print the strongest of the genorations
-        if i mod 1000 = 0 then
+        if i mod debug_interval = 0 then
         begin
             //reset the best
             best := 0;

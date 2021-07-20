@@ -22,7 +22,7 @@ type
         procedure rebuild();
         procedure reset_buffer();
         function new_offspring():gate_network;
-        procedure compute();
+        procedure compute(computations: integer = 1);
     end;
 
 implementation
@@ -78,14 +78,16 @@ begin
 
 end;
 
-procedure gate_network.compute();
+procedure gate_network.compute(computations: integer = 1);
 var
-    i : integer;
+    i,j : integer;
 begin
-
-    for i := 0 to high(self.gates) do
+    for j := 0 to computations do
     begin
-        self.gate_output[i] ^ := booltobit(self.gates[i].compute());
+        for i := 0 to high(self.gates) do
+        begin
+            self.gate_output[i] ^ := booltobit(self.gates[i].compute());
+        end;
     end;
 end;
 
